@@ -16,13 +16,13 @@ function move_logs_and_output() {
 }
 
 #compute treewidths of random graphs according to parameters of the yml file
-python -m evaluation_acm_ccr_2019.cli execute_treewidth_computation_experiment --threads 2 sample_treewidth_computation.yml --timeout 5400 --remove_intermediate_solutions
+python -m evaluation_acm_ccr_2019.cli execute-treewidth-computation-experiment --threads 4 sample_treewidth_computation.yml --timeout 5400 --remove_intermediate_solutions
 move_logs_and_output log_treewidth_computation
 
 
-python -m evaluation_acm_ccr_2019.cli treewidth_plot_computation_results sample_treewidth_computation.yml input/sample_treewidth_computation_results_aggregated_results.pickle ./plots/ --output_filetype pdf
+python -m evaluation_acm_ccr_2019.cli treewidth-plot-computation-results sample_treewidth_computation.yml input/sample_treewidth_computation_results_aggregated_results.pickle ./plots/ --output_filetype pdf
 move_logs_and_output log_treewidth_plot_pdf
 
-python -m evaluation_acm_ccr_2019.cli treewidth_plot_computation_results sample_treewidth_computation.yml input/sample_treewidth_computation_results_aggregated_results.pickle ./plots/ --output_filetype png
+python -m evaluation_acm_ccr_2019.cli treewidth-plot-computation-results sample_treewidth_computation.yml input/sample_treewidth_computation_results_aggregated_results.pickle ./plots/ --output_filetype png
 move_logs_and_output log_treewidth_plot_png
 

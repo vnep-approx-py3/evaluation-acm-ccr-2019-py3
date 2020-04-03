@@ -16,42 +16,42 @@ function move_logs_and_output() {
 }
 
 #compute treewidths of random graphs according to parameters of the yml file
-python -m evaluation_acm_ccr_2019.cli execute_treewidth_computation_experiment --threads 4 sample_treewidth_computation.yml --timeout 5400 --remove_intermediate_solutions
+python -m evaluation_acm_ccr_2019.cli execute-treewidth-computation-experiment --threads 4 sample_treewidth_computation.yml --timeout 5400 --remove_intermediate_solutions
 move_logs_and_output log_treewidth_computation
 
 #extract undirected graph storage
-python -m evaluation_acm_ccr_2019.cli create_undirected_graph_storage_from_treewidth_experiments input/sample_treewidth_computation_results_aggregated_results.pickle input/sample_undirected_graph_storage.pickle 2 3 
+python -m evaluation_acm_ccr_2019.cli create-undirected-graph-storage-from-treewidth-experiments input/sample_treewidth_computation_results_aggregated_results.pickle input/sample_undirected_graph_storage.pickle 2 3
 move_logs_and_output log_undirected_graph_storage
 
 
 #generate scenarios
-python -m vnep_approx.cli generate_scenarios sample_scenarios.pickle sample_scenario_generation.yml --threads 4
+python -m vnep_approx.cli generate-scenarios sample_scenarios.pickle sample_scenario_generation.yml --threads 4
 move_logs_and_output log_scenario_generation 
 
 
 #run randomized rounding algorithm using separation lp with dynvmp
-python -m vnep_approx.cli start_experiment sample_rr_seplp_dynvmp_execution.yml 0 10000 --concurrent 4 --overwrite_existing_intermediate_solutions --keep_temporary_scenarios --remove_intermediate_solutions
+python -m vnep_approx.cli start-experiment sample_rr_seplp_dynvmp_execution.yml 0 10000 --concurrent 4 --overwrite_existing_intermediate_solutions --keep_temporary_scenarios --remove_intermediate_solutions
 move_logs_and_output log_seplp_dynvmp_execution
 
 #run vine algorithm
-python -m vnep_approx.cli start_experiment sample_vine_execution.yml 0 10000 --concurrent 4 --overwrite_existing_intermediate_solutions --remove_temporary_scenarios --remove_intermediate_solutions
+python -m vnep_approx.cli start-experiment sample_vine_execution.yml 0 10000 --concurrent 4 --overwrite_existing_intermediate_solutions --remove_temporary_scenarios --remove_intermediate_solutions
 move_logs_and_output log_vine_execution
 
 
 #extract data to be plotted
-python -m evaluation_acm_ccr_2019.cli reduce_to_plotdata_rr_seplp_optdynvmp sample_scenarios_results_seplp_dynvmp.pickle
+python -m evaluation_acm_ccr_2019.cli reduce-to-plotdata-rr-seplp-optdynvmp sample_scenarios_results_seplp_dynvmp.pickle
 move_logs_and_output log_reduction_rr_seplp_dynvmp
 
-python -m evaluation_acm_ccr_2019.cli reduce_to_plotdata_vine sample_scenarios_ViNE_results.pickle
+python -m evaluation_acm_ccr_2019.cli reduce-to-plotdata-vine sample_scenarios_ViNE_results.pickle
 move_logs_and_output log_reduction_vine
 
 #generate plots in folder ./plots
 mkdir -p ./plots
 
-python -m evaluation_acm_ccr_2019.cli evaluate_separation_randround_vs_vine sample_scenarios_results_seplp_dynvmp_reduced.pickle sample_scenarios_ViNE_results_reduced.pickle ./plots/ --request_sets "[[20,30], [40,50]]" --output_filetype pdf --papermode
+python -m evaluation_acm_ccr_2019.cli evaluate-separation-randround-vs-vine sample_scenarios_results_seplp_dynvmp_reduced.pickle sample_scenarios_ViNE_results_reduced.pickle ./plots/ --request_sets "[[20,30], [40,50]]" --output_filetype pdf --papermode
 move_logs_and_output log_plot_pdf
 
-python -m evaluation_acm_ccr_2019.cli evaluate_separation_randround_vs_vine sample_scenarios_results_seplp_dynvmp_reduced.pickle sample_scenarios_ViNE_results_reduced.pickle ./plots/ --request_sets "[[20,30], [40,50]]" --output_filetype png --non-papermode
+python -m evaluation_acm_ccr_2019.cli evaluate-separation-randround-vs-vine sample_scenarios_results_seplp_dynvmp_reduced.pickle sample_scenarios_ViNE_results_reduced.pickle ./plots/ --request_sets "[[20,30], [40,50]]" --output_filetype png --non-papermode
 move_logs_and_output log_plot_png
 
 rm gurobi.log
