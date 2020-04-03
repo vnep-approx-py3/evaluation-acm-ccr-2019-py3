@@ -1,19 +1,19 @@
 from setuptools import setup, find_packages
 
 install_requires = [
-    # "gurobipy",  	# install this manually
-    # "alib",      	# install this manually
-    # "vnep_approx" , 	# install this manually 
-    "matplotlib>=2.2,<2.3",
+    # "gurobipy",  	 # install this manually
+    # "alib",      	 # install this manually
+    # "vnep_approx", # install this manually
+    "matplotlib",
     "numpy",
-    "click==6.7",
+    "click",
     "pyyaml",
     "jsonpickle",
 ]
 
 setup(
     name="evaluation-acm-ccr-2019",
-    # version="0.1",
+    python_requires=">=3.7",
     packages=["evaluation_acm_ccr_2019"],
     install_requires=install_requires,
     entry_points={

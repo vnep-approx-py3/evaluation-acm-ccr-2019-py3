@@ -28,7 +28,7 @@ import vnep_approx
 import os
 
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 
@@ -44,7 +44,7 @@ logger = logging.getLogger(__name__)
 def extract_parameter_range(scenario_parameter_space_dict, key):
     if not isinstance(scenario_parameter_space_dict, dict):
         return None
-    for generator_name, value in scenario_parameter_space_dict.iteritems():
+    for generator_name, value in scenario_parameter_space_dict.items():
         if generator_name == key:
             return [key], value
         if isinstance(value, list):
@@ -66,7 +66,7 @@ def lookup_scenarios_having_specific_values(scenario_parameter_space_dict, path,
     current_path = path[:]
     current_dict = scenario_parameter_space_dict
     while len(current_path) > 0:
-        if isinstance(current_path[0], basestring):
+        if isinstance(current_path[0], str):
             current_dict = current_dict[current_path[0]]
             current_path.pop(0)
         elif current_path[0] == 0:
@@ -81,7 +81,7 @@ def lookup_scenario_parameter_room_dicts_on_path(scenario_parameter_space_dict, 
     dicts_on_path = []
     while len(current_path) > 0:
         dicts_on_path.append(current_dict_or_list)
-        if isinstance(current_path[0], basestring):
+        if isinstance(current_path[0], str):
             current_dict_or_list = current_dict_or_list[current_path[0]]
             current_path.pop(0)
         elif isinstance(current_path[0], int):
@@ -133,7 +133,7 @@ def evaluate_baseline_and_randround(dc_seplp_dynvmp,
         forbidden_scenario_ids = set()
 
     if exclude_generation_parameters is not None:
-        for key, values_to_exclude in exclude_generation_parameters.iteritems():
+        for key, values_to_exclude in exclude_generation_parameters.items():
             parameter_filter_path, parameter_values = extract_parameter_range(
                 dc_seplp_dynvmp.scenario_parameter_container.scenarioparameter_room, key)
 
@@ -164,15 +164,15 @@ def evaluate_baseline_and_randround(dc_seplp_dynvmp,
                                   dc_seplp_dynvmp.algorithm_scenario_solution_dictionary[seplp_dynvmp_algorithm_id][
                                       scenario_index][seplp_dynvmp_execution_config]
                               for scenario_index in
-                              dc_seplp_dynvmp.algorithm_scenario_solution_dictionary[
-                                  seplp_dynvmp_algorithm_id].keys() if scenario_index not in forbidden_scenario_ids}
+                              list(dc_seplp_dynvmp.algorithm_scenario_solution_dictionary[
+                                  seplp_dynvmp_algorithm_id].keys()) if scenario_index not in forbidden_scenario_ids}
 
     randround_data_set = {scenario_index:
                                   dc_randround.algorithm_scenario_solution_dictionary[randround_algorithm_id][
                                       scenario_index][randround_execution_config]
                           for scenario_index in
-                          dc_randround.algorithm_scenario_solution_dictionary[
-                                  randround_algorithm_id].keys() if scenario_index not in forbidden_scenario_ids}
+                          list(dc_randround.algorithm_scenario_solution_dictionary[
+                                  randround_algorithm_id].keys()) if scenario_index not in forbidden_scenario_ids}
 
 
 

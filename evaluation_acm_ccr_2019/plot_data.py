@@ -27,7 +27,7 @@ import numpy as np
 from alib import solutions, util
 
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 
@@ -127,17 +127,17 @@ class OfflineViNEResultCollectionReducer(object):
 
         ssd = scenario_solution_storage.algorithm_scenario_solution_dictionary
         ssd_reduced = {}
-        for algorithm in ssd.keys():
+        for algorithm in list(ssd.keys()):
             logger.info(".. Reducing results of algorithm {}".format(algorithm))
             ssd_reduced[algorithm] = {}
-            for scenario_id in ssd[algorithm].keys():
+            for scenario_id in list(ssd[algorithm].keys()):
                 logger.info("   .. handling scenario {}".format(scenario_id))
                 ssd_reduced[algorithm][scenario_id] = {}
-                for exec_id in ssd[algorithm][scenario_id].keys():
+                for exec_id in list(ssd[algorithm][scenario_id].keys()):
                     ssd_reduced[algorithm][scenario_id][exec_id] = {}
                     params, scenario = scenario_solution_storage.scenario_parameter_container.scenario_triple[scenario_id]
                     solution_collection = ssd[algorithm][scenario_id][exec_id].get_solution()
-                    for vine_settings, result_list in solution_collection.iteritems():
+                    for vine_settings, result_list in solution_collection.items():
                         ssd_reduced[algorithm][scenario_id][exec_id][vine_settings] = []
                         number_of_req_profit = 0
                         for req in scenario.requests:
@@ -209,7 +209,7 @@ class OfflineViNEResultCollectionReducer(object):
         num_initial_lp_failed = 0
         num_node_mapping_failed = 0
         num_edge_mapping_failed = 0
-        for status in vine_result.mapping_status_per_request.values():
+        for status in list(vine_result.mapping_status_per_request.values()):
             if status == vine.ViNEMappingStatus.is_embedded:
                 num_is_embedded += 1
             elif status == vine.ViNEMappingStatus.initial_lp_failed:
@@ -253,16 +253,16 @@ class RandRoundSepLPOptDynVMPCollectionResultReducer(object):
         sss.scenario_parameter_container.scenario_list = None
         sss.scenario_parameter_container.scenario_triple = None
 
-        for alg, scenario_solution_dict in sss.algorithm_scenario_solution_dictionary.iteritems():
+        for alg, scenario_solution_dict in sss.algorithm_scenario_solution_dictionary.items():
             logger.info(".. Reducing results of algorithm {}".format(alg))
-            for sc_id, ex_param_solution_dict in scenario_solution_dict.iteritems():
+            for sc_id, ex_param_solution_dict in scenario_solution_dict.items():
                 logger.info("   .. handling scenario {}".format(sc_id))
-                for ex_id, solution in ex_param_solution_dict.iteritems():
+                for ex_id, solution in ex_param_solution_dict.items():
                     compressed = self.reduce_single_solution(solution)
                     ex_param_solution_dict[ex_id] = compressed
 
         logger.info("Writing result pickle to {}".format(reduced_randround_solutions_output_pickle_path))
-        with open(reduced_randround_solutions_output_pickle_path, "w") as f:
+        with open(reduced_randround_solutions_output_pickle_path, "wb") as f:
             pickle.dump(sss, f)
         logger.info("All done.")
         return sss
@@ -277,7 +277,7 @@ class RandRoundSepLPOptDynVMPCollectionResultReducer(object):
         rounding_runtimes = {}
         profits = {}
 
-        for algorithm_sub_parameters, rounding_result_list in solution.solutions.items():
+        for algorithm_sub_parameters, rounding_result_list in list(solution.solutions.items()):
             max_node_loads[algorithm_sub_parameters] = []
             max_edge_loads[algorithm_sub_parameters] = []
             rounding_runtimes[algorithm_sub_parameters] = []
@@ -289,7 +289,7 @@ class RandRoundSepLPOptDynVMPCollectionResultReducer(object):
                 rounding_runtimes[algorithm_sub_parameters].append(rounding_result.time_to_round_solution)
                 profits[algorithm_sub_parameters].append(rounding_result.profit)
 
-        for algorithm_sub_parameters in solution.solutions.keys():
+        for algorithm_sub_parameters in list(solution.solutions.keys()):
             max_node_loads[algorithm_sub_parameters] = get_aggregated_data(max_node_loads[algorithm_sub_parameters])
             max_edge_loads[algorithm_sub_parameters] = get_aggregated_data(max_edge_loads[algorithm_sub_parameters])
             rounding_runtimes[algorithm_sub_parameters] = get_aggregated_data(rounding_runtimes[algorithm_sub_parameters])
@@ -326,7 +326,7 @@ def _initialize_load_dict(scenario):
 
 
 def _compute_mapping_load(load, req, req_mapping):
-    for i, u in req_mapping.mapping_nodes.iteritems():
+    for i, u in req_mapping.mapping_nodes.items():
         node_demand = req.get_node_demand(i)
         load[(req.get_type(i), u)] += node_demand
 
@@ -338,23 +338,23 @@ def _compute_mapping_load(load, req, req_mapping):
 
 
 def _compute_mapping_edge_load_unsplittable(load, req, req_mapping):
-    for ij, sedge_list in req_mapping.mapping_edges.iteritems():
+    for ij, sedge_list in req_mapping.mapping_edges.items():
         edge_demand = req.get_edge_demand(ij)
         for uv in sedge_list:
             load[uv] += edge_demand
 
 
 def _compute_mapping_edge_load_splittable(load, req, req_mapping):
-    for ij, edge_vars_dict in req_mapping.mapping_edges.iteritems():
+    for ij, edge_vars_dict in req_mapping.mapping_edges.items():
         edge_demand = req.get_edge_demand(ij)
-        for uv, x in edge_vars_dict.items():
+        for uv, x in list(edge_vars_dict.items()):
             load[uv] += edge_demand * x
 
 
 def get_max_node_and_edge_load(load_dict, substrate):
     max_node_load = 0
     max_edge_load = 0
-    for resource, value in load_dict.iteritems():
+    for resource, value in load_dict.items():
         x, y = resource
         if resource in substrate.edges:
             max_edge_load = max(max_edge_load, value)

@@ -33,7 +33,7 @@ import yaml
 from alib import datamodel, util
 
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 
@@ -115,7 +115,7 @@ class SimpleTreeDecompositionExperiment(object):
         logger.info("Combining results")
         result_dict = {}
         for fname in self.output_filenames:
-            with open(fname, "r") as f:
+            with open(fname, "rb") as f:
                 try:
                     while True:
                         result = pickle.load(f)
@@ -129,7 +129,7 @@ class SimpleTreeDecompositionExperiment(object):
 
         pickle_file = self.output_file_base_name.format(process_index="aggregated_results")
         logger.info("Writing combined Pickle to {}".format(pickle_file))
-        with open(pickle_file, "w") as f:
+        with open(pickle_file, "wb") as f:
             pickle.dump(result_dict, f)
 
         if self.remove_process_pickles:
@@ -162,7 +162,7 @@ def execute_single_experiment(process_index,
     for repetition_index, params in enumerate(itertools.product(
             num_nodes_list,
             connection_probabilities_list,
-            range(repetitions)
+            list(range(repetitions))
     )):
         if repetition_index % num_processes == process_index:
             num_nodes, prob, repetition_index = params
@@ -206,7 +206,7 @@ def execute_single_experiment(process_index,
             )
             logger.info("Result: {}".format(result.short_representation()))
 
-            with open(out_file, "a") as f:
+            with open(out_file, "ab") as f:
                 pickle.dump(result, f)
 
             del graph
@@ -236,7 +236,7 @@ class SimpleRandomGraphGenerator(object):
         undirected_graph = datamodel.UndirectedGraph(name)
 
         # create nodes
-        for i in xrange(1, number_of_nodes + 1):
+        for i in range(1, number_of_nodes + 1):
             undirected_graph.add_node(str(i))
 
         # create edges

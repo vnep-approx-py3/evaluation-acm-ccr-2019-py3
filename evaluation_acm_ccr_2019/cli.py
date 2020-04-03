@@ -34,14 +34,14 @@ from alib import util
 from alib import datamodel
 
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 
 
 def initialize_logger(filename, log_level_print, log_level_file, allow_override=False):
-    log_level_print = logging._levelNames[log_level_print.upper()]
-    log_level_file = logging._levelNames[log_level_file.upper()]
+    log_level_print = logging._nameToLevel[log_level_print.upper()]
+    log_level_file = logging._nameToLevel[log_level_file.upper()]
     util.initialize_root_logger(filename, log_level_print, log_level_file, allow_override=allow_override)
 
 @click.group()
@@ -89,7 +89,7 @@ def execute_treewidth_computation_experiment(yaml_parameter_file, threads, timeo
 @click.argument('min_tw', type=click.INT)
 @click.argument('max_tw', type=click.INT)
 @click.option('--min_nodes', type=click.INT, default=0)
-@click.option('--max_nodes', type=click.INT, default=sys.maxint)
+@click.option('--max_nodes', type=click.INT, default=sys.maxsize)
 @click.option('--min_conn_prob', type=click.FLOAT, default=0)
 @click.option('--max_conn_prob', type=click.FLOAT, default=1.0)
 def create_undirected_graph_storage_from_treewidth_experiments(input_pickle_file,
@@ -112,13 +112,13 @@ def create_undirected_graph_storage_from_treewidth_experiments(input_pickle_file
 
     input_contents = None
     logger.info("Reading file {}".format(input_pickle_file))
-    with open(input_pickle_file, "r") as f:
+    with open(input_pickle_file, "rb") as f:
         input_contents = pickle.load(f)
 
-    for number_of_nodes in input_contents.keys():
+    for number_of_nodes in list(input_contents.keys()):
         logger.info("Handling graphs stored for number of nodes {}".format(number_of_nodes))
         data_for_nodes = input_contents[number_of_nodes]
-        for connection_probability in data_for_nodes.keys():
+        for connection_probability in list(data_for_nodes.keys()):
             if connection_probability < min_conn_prob or connection_probability > max_conn_prob:
                 continue
             list_of_results = data_for_nodes[connection_probability]
@@ -134,13 +134,13 @@ def create_undirected_graph_storage_from_treewidth_experiments(input_pickle_file
                 graph_storage.add_graph_as_edge_representation(result_tw, undirected_edge_representation)
 
     logger.info("Writing file {}".format(output_pickle_file))
-    with open(output_pickle_file, "w") as f:
+    with open(output_pickle_file, "wb") as f:
         pickle.dump(graph_storage, f)
 
 
 @cli.command(short_help="Generate plots for treewidth computation by Tamaki's algorithm")
 @click.argument('parameters_file', type=click.File('r'))
-@click.argument('results_pickle_file', type=click.File('r'))
+@click.argument('results_pickle_file', type=click.File('rb'))
 @click.argument('output_path', type=click.Path())
 @click.option('--output_filetype', type=click.Choice(['png', 'pdf', 'eps']), default="png", help="the filetype which shall be created")
 def treewidth_plot_computation_results(parameters_file, results_pickle_file, output_path, output_filetype):

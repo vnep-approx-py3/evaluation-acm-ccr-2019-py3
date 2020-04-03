@@ -18,7 +18,7 @@ from vnep_approx import treewidth_model
 import math
 
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 
@@ -68,7 +68,7 @@ logger = util.get_logger(__name__, make_file=False, propagate=True)
 class HeatmapPlotType(object):
     Simple_Treewidth_Evaluation_Average = 0
     Simple_Treewidth_Evaluation_Max = 1
-    VALUE_RANGE = range(Simple_Treewidth_Evaluation_Average, Simple_Treewidth_Evaluation_Max + 1)
+    VALUE_RANGE = list(range(Simple_Treewidth_Evaluation_Average, Simple_Treewidth_Evaluation_Max + 1))
 
 
 """
@@ -299,7 +299,7 @@ global_decomposition_runtime_plot_specfications = [
 
 decomposition_runtime_plot_axis_specification_treewidth = dict(
     x_axis_title="Treewidth",
-    x_axis_ticks=range(0, 46, 5),
+    x_axis_ticks=list(range(0, 46, 5)),
     xlim=(-3,45),
     filename="treewidth",
     x_axis_function=lambda tw_result: tw_result.treewidth,
@@ -380,7 +380,7 @@ class AbstractPlotter(object):
         if self.save_plot:
             if not os.path.exists(output_path):
                 os.makedirs(output_path)
-            print "saving plot: {}".format(filename)
+            print("saving plot: {}".format(filename))
             plt.savefig(filename)
         if self.show_plot:
             plt.show()
@@ -425,7 +425,7 @@ class SingleBoxplotPlotter(AbstractPlotter):
         if sampling_rate is None:
             sampling_rate = 1
         self.sampling_rate = sampling_rate
-        print "Sampling every {} values per parameter combination (at least one)".format(self.sampling_rate)
+        print("Sampling every {} values per parameter combination (at least one)".format(self.sampling_rate))
         self.read_pickle = read_pickle
         self.write_pickle = write_pickle
 
@@ -460,7 +460,7 @@ class SingleBoxplotPlotter(AbstractPlotter):
             self._write_data_to_pickle(base_filename, values_dict)
 
         if self.paper_mode:
-            print boxplot_axes_specification
+            print(boxplot_axes_specification)
             ax.set_title(boxplot_axes_specification['plot_title'], fontsize=PLOT_TITLE_FONT_SIZE)
         else:
             title = boxplot_metric_specification['name'] + "\n"
@@ -472,10 +472,10 @@ class SingleBoxplotPlotter(AbstractPlotter):
         t_start = time()
         boxes = ax.boxplot(
             [values_dict[key] for key in sorted_x_values],  # convert to list of lists
-            positions=map(
+            positions=list(map(
                 boxplot_axes_specification.get("box_position_function", lambda x: x),
                 sorted_x_values
-            ),
+            )),
             flierprops=dict(
                 marker='o',
                 markersize=4,
@@ -488,11 +488,11 @@ class SingleBoxplotPlotter(AbstractPlotter):
                 color="k",
             ),
         )
-        print "Plotting:", time() - t_start, "seconds"
+        print("Plotting:", time() - t_start, "seconds")
 
         if "x_axis_ticks" in boxplot_axes_specification:
             ax.set_xticks(boxplot_axes_specification["x_axis_ticks"])
-            ax.set_xticklabels(map(str, boxplot_axes_specification["x_axis_ticks"]))
+            ax.set_xticklabels(list(map(str, boxplot_axes_specification["x_axis_ticks"])))
 
         if boxplot_metric_specification.get("use_log_scale", False):
             plt.yscale('log')
@@ -513,10 +513,10 @@ class SingleBoxplotPlotter(AbstractPlotter):
         values_dict = None
         if self.read_pickle:
             plot_data_pickle_file = self._get_path_to_pickle_file(base_filename)
-            print("Trying to read file: {}".format(plot_data_pickle_file))
+            print(("Trying to read file: {}".format(plot_data_pickle_file)))
             if os.path.exists(plot_data_pickle_file):
-                print "Reading plot data pickle from {}".format(plot_data_pickle_file)
-                with open(plot_data_pickle_file, "r") as f:
+                print("Reading plot data pickle from {}".format(plot_data_pickle_file))
+                with open(plot_data_pickle_file, "rb") as f:
                     values_dict = pickle.load(f)
         return values_dict
 
@@ -525,8 +525,8 @@ class SingleBoxplotPlotter(AbstractPlotter):
         parent_dir = os.path.dirname(plot_data_pickle_file)
         if not os.path.exists(parent_dir):
             os.makedirs(parent_dir)
-        with open(plot_data_pickle_file, "w") as f:
-            print "Writing pickle to {}".format(plot_data_pickle_file)
+        with open(plot_data_pickle_file, "wb") as f:
+            print("Writing pickle to {}".format(plot_data_pickle_file))
             pickle.dump(values_dict, f)
 
     def _get_path_to_pickle_file(self, base_filename):
@@ -538,9 +538,9 @@ class SingleBoxplotPlotter(AbstractPlotter):
         values_dict = {}
         lookup_function = boxplot_metric_specification["lookup_function"]
         x_axis_function = boxplot_axes_specification["x_axis_function"]
-        for num_nodes, prob_results_dict in self.data_dict.iteritems():
-            for prob, results in prob_results_dict.iteritems():
-                print "\tprocessing data: {} nodes, prob {}".format(num_nodes, prob)
+        for num_nodes, prob_results_dict in self.data_dict.items():
+            for prob, results in prob_results_dict.items():
+                print("\tprocessing data: {} nodes, prob {}".format(num_nodes, prob))
                 # assert len(results) == self.experiment_parameters["scenario_repetition"]  # sanity check for now
                 # logger.debug("values are {}".format(values_dict))
                 for result in results[::self.sampling_rate]:
@@ -548,11 +548,11 @@ class SingleBoxplotPlotter(AbstractPlotter):
                     if x_val not in values_dict:
                         values_dict[x_val] = []
                     values_dict[x_val].append(lookup_function(result))
-        print "Boxplot data processing:", time() - t_start, "seconds"
+        print("Boxplot data processing:", time() - t_start, "seconds")
         return values_dict
 
     def _get_sol_count_string(self, values_dict):
-        lens = map(len, values_dict.values())
+        lens = list(map(len, list(values_dict.values())))
         min_number_of_observed_values = min(lens)
         max_number_of_observed_values = max(lens)
         if not self.paper_mode:
@@ -600,7 +600,7 @@ class DecompositionRuntimePlotter(AbstractPlotter):
         if sampling_rate is None:
             sampling_rate = 1
         self.sampling_rate = sampling_rate
-        print "Sampling every {} values per parameter combination (at least one)".format(self.sampling_rate)
+        print("Sampling every {} values per parameter combination (at least one)".format(self.sampling_rate))
         self.read_pickle = read_pickle
         self.write_pickle = write_pickle
 
@@ -629,7 +629,7 @@ class DecompositionRuntimePlotter(AbstractPlotter):
 
         fig, ax = plt.subplots(figsize=(FIGSIZE[0]-0.75,FIGSIZE[1]))
         if self.paper_mode:
-            print decomposition_runtime_axes_specification
+            print(decomposition_runtime_axes_specification)
             ax.set_title(decomposition_runtime_axes_specification['plot_title'], fontsize=PLOT_TITLE_FONT_SIZE)
         else:
             title = decomposition_runtime_metric_specification['name'] + "\n"
@@ -696,11 +696,11 @@ class DecompositionRuntimePlotter(AbstractPlotter):
                         borderaxespad=0.175, borderpad=0.2, handlelength=1.75, frameon=True)
 
 
-        print "Plotting:", time() - t_start, "seconds"
+        print("Plotting:", time() - t_start, "seconds")
 
         if "x_axis_ticks" in decomposition_runtime_axes_specification:
             ax.set_xticks(decomposition_runtime_axes_specification["x_axis_ticks"])
-            ax.set_xticklabels(map(str, decomposition_runtime_axes_specification["x_axis_ticks"]))
+            ax.set_xticklabels(list(map(str, decomposition_runtime_axes_specification["x_axis_ticks"])))
 
         if decomposition_runtime_metric_specification.get("use_log_scale", False):
             plt.yscale('log')
@@ -746,10 +746,10 @@ class DecompositionRuntimePlotter(AbstractPlotter):
         values_dict = None
         if self.read_pickle:
             plot_data_pickle_file = self._get_path_to_pickle_file(base_filename)
-            print("Trying to read file: {}".format(plot_data_pickle_file))
+            print(("Trying to read file: {}".format(plot_data_pickle_file)))
             if os.path.exists(plot_data_pickle_file):
-                print "Reading plot data pickle from {}".format(plot_data_pickle_file)
-                with open(plot_data_pickle_file, "r") as f:
+                print("Reading plot data pickle from {}".format(plot_data_pickle_file))
+                with open(plot_data_pickle_file, "rb") as f:
                     values_dict = pickle.load(f)
         return values_dict
 
@@ -758,8 +758,8 @@ class DecompositionRuntimePlotter(AbstractPlotter):
         parent_dir = os.path.dirname(plot_data_pickle_file)
         if not os.path.exists(parent_dir):
             os.makedirs(parent_dir)
-        with open(plot_data_pickle_file, "w") as f:
-            print "Writing pickle to {}".format(plot_data_pickle_file)
+        with open(plot_data_pickle_file, "wb") as f:
+            print("Writing pickle to {}".format(plot_data_pickle_file))
             pickle.dump(values_dict, f)
 
     def _get_path_to_pickle_file(self, base_filename):
@@ -771,9 +771,9 @@ class DecompositionRuntimePlotter(AbstractPlotter):
         values_dict = {}
         lookup_function = boxplot_metric_specification["lookup_function"]
         x_axis_function = decomposition_runtime_axes_specification["x_axis_function"]
-        for num_nodes, prob_results_dict in self.data_dict.iteritems():
-            for prob, results in prob_results_dict.iteritems():
-                print "\tprocessing data: {} nodes, prob {}".format(num_nodes, prob)
+        for num_nodes, prob_results_dict in self.data_dict.items():
+            for prob, results in prob_results_dict.items():
+                print("\tprocessing data: {} nodes, prob {}".format(num_nodes, prob))
                 # assert len(results) == self.experiment_parameters["scenario_repetition"]  # sanity check for now
                 #logger.debug("values are {}".format(values_dict))
                 for result in results[::self.sampling_rate]:
@@ -781,11 +781,11 @@ class DecompositionRuntimePlotter(AbstractPlotter):
                     if x_val not in values_dict:
                         values_dict[x_val] = []
                     values_dict[x_val].append(lookup_function(result))
-        print "DecompositionRuntime data processing:", time() - t_start, "seconds"
+        print("DecompositionRuntime data processing:", time() - t_start, "seconds")
         return values_dict
 
     def _get_sol_count_string(self, values_dict):
-        lens = map(len, values_dict.values())
+        lens = list(map(len, list(values_dict.values())))
         min_number_of_observed_values = min(lens)
         max_number_of_observed_values = max(lens)
         solution_count_string = ""
@@ -961,7 +961,7 @@ class SingleHeatmapPlotter(AbstractPlotter):
                 cbar.set_ticklabels(tick_labels)
                 cbar.ax.tick_params(labelsize=TICK_LABEL_FONT_SIZE)
             else:
-                print "No colorbar tick labels were specified for {}".format(heatmap_metric_specification["name"])
+                print("No colorbar tick labels were specified for {}".format(heatmap_metric_specification["name"]))
             # for label in cbar.ax.get_yticklabels():
             #    label.set_fontproperties(font_manager.FontProperties(family="Courier New",weight='bold'))
             cbar.ax.tick_params(**HEATMAP_COLORBAR_TICK_PARAMS)
@@ -972,7 +972,7 @@ class SingleHeatmapPlotter(AbstractPlotter):
             ax.set_xticks(tick_locations, minor=False)
             tick_locations_minor = [xaxis_parameters.index(x) for x in heatmap_axes_specification["x_axis_ticks_minor"]]
             ax.set_xticks(tick_locations_minor, minor=True)
-            x_labels = map(heatmap_axes_specification["x_axis_tick_formatting"], heatmap_axes_specification["x_axis_ticks"])
+            x_labels = list(map(heatmap_axes_specification["x_axis_tick_formatting"], heatmap_axes_specification["x_axis_ticks"]))
             ax.set_xticklabels(x_labels, minor=False, fontsize=TICK_LABEL_FONT_SIZE)
         else:
             ax.set_xticks(np.arange(X.shape[1]) + 0.5, minor=False)
@@ -983,7 +983,7 @@ class SingleHeatmapPlotter(AbstractPlotter):
             ax.set_yticks(tick_locations, minor=False)
             tick_locations_minor = [yaxis_parameters.index(x) for x in heatmap_axes_specification["y_axis_ticks_minor"]]
             ax.set_yticks(tick_locations_minor, minor=True)
-            y_labels = map(heatmap_axes_specification["y_axis_tick_formatting"], heatmap_axes_specification["y_axis_ticks"])
+            y_labels = list(map(heatmap_axes_specification["y_axis_tick_formatting"], heatmap_axes_specification["y_axis_ticks"]))
             ax.set_yticklabels(y_labels, minor=False, fontsize=TICK_LABEL_FONT_SIZE)
         else:
             ax.set_yticks(np.arange(X.shape[0]) + 0.5, minor=False)

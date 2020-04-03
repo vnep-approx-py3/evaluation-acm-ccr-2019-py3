@@ -34,7 +34,7 @@ from time import gmtime, strftime
 import copy
 
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 
@@ -259,7 +259,7 @@ def compute_aggregated_mean(list_of_aggregated_data, debug=False):
         mean += agg.mean * agg.value_count
         value_count += agg.value_count
     if debug:
-        print len(list_of_aggregated_data), value_count, mean/value_count
+        print(len(list_of_aggregated_data), value_count, mean/value_count)
     return mean / value_count
 
 
@@ -837,7 +837,7 @@ def compute_average_node_load(result_summary):
                 "This should be fixed in the future and might yield wrong results when considering more general "
                 "resource types. Disregard this warning if you know what you are doing.")
     cum_loads = []
-    for (x, y) in result_summary.load.keys():
+    for (x, y) in list(result_summary.load.keys()):
         if x == "universal":
             cum_loads.append(result_summary.load[(x, y)])
     return np.mean(cum_loads)
@@ -848,7 +848,7 @@ def compute_average_edge_load(result_summary):
                 "This should be fixed in the future and might yield wrong results when considering more general "
                 "resource types. Disregard this warning if you know what you are doing.")
     cum_loads = []
-    for (x, y) in result_summary.load.keys():
+    for (x, y) in list(result_summary.load.keys()):
         if x != "universal":
             cum_loads.append(result_summary.load[(x, y)])
     return np.mean(cum_loads)
@@ -859,7 +859,7 @@ def compute_max_node_load(result_summary):
                 "This should be fixed in the future and might yield wrong results when considering more general "
                 "resource types.  Disregard this warning if you know what you are doing.")
     cum_loads = []
-    for (x, y) in result_summary.load.keys():
+    for (x, y) in list(result_summary.load.keys()):
         if x == "universal":
             cum_loads.append(result_summary.load[(x, y)])
     return max(cum_loads)
@@ -870,7 +870,7 @@ def compute_max_edge_load(result_summary):
                 "This should be fixed in the future and might yield wrong results when considering more general "
                 "resource types. Disregard this warning if you know what you are doing.")
     cum_loads = []
-    for (x, y) in result_summary.load.keys():
+    for (x, y) in list(result_summary.load.keys()):
         if x != "universal":
             cum_loads.append(result_summary.load[(x, y)])
     return max(cum_loads)
@@ -878,14 +878,14 @@ def compute_max_edge_load(result_summary):
 
 def compute_avg_load(result_summary):
     cum_loads = []
-    for (x, y) in result_summary.load.keys():
+    for (x, y) in list(result_summary.load.keys()):
         cum_loads.append(result_summary.load[(x, y)])
     return np.mean(cum_loads)
 
 
 def compute_max_load(result_summary):
     cum_loads = []
-    for (x, y) in result_summary.load.keys():
+    for (x, y) in list(result_summary.load.keys()):
         cum_loads.append(result_summary.load[(x, y)])
     return max(cum_loads)
 
@@ -919,7 +919,7 @@ def extract_parameter_range(scenario_parameter_space, key):
 def _extract_parameter_range(scenario_parameter_space_dict, key, min_recursion_depth=0):
     if not isinstance(scenario_parameter_space_dict, dict):
         return None
-    for generator_name, value in scenario_parameter_space_dict.iteritems():
+    for generator_name, value in scenario_parameter_space_dict.items():
         if generator_name == key and min_recursion_depth <= 0:
             return [key], value
         if isinstance(value, list):
@@ -944,7 +944,7 @@ def extract_generation_parameters(scenario_parameter_dict, scenario_id):
 
     results = []
 
-    for generator_name, value in scenario_parameter_dict.iteritems():
+    for generator_name, value in scenario_parameter_dict.items():
         if isinstance(value, set) and generator_name != "all" and scenario_id in value:
             return [[generator_name]]
         if isinstance(value, list):
@@ -972,7 +972,7 @@ def lookup_scenarios_having_specific_values(scenario_parameter_space_dict, path,
     current_path = path[:]
     current_dict = scenario_parameter_space_dict
     while len(current_path) > 0:
-        if isinstance(current_path[0], basestring):
+        if isinstance(current_path[0], str):
             current_dict = current_dict[current_path[0]]
             current_path.pop(0)
         elif current_path[0] == 0:
@@ -987,7 +987,7 @@ def lookup_scenario_parameter_room_dicts_on_path(scenario_parameter_space_dict, 
     dicts_on_path = []
     while len(current_path) > 0:
         dicts_on_path.append(current_dict_or_list)
-        if isinstance(current_path[0], basestring):
+        if isinstance(current_path[0], str):
             current_dict_or_list = current_dict_or_list[current_path[0]]
             current_path.pop(0)
         elif isinstance(current_path[0], int):
@@ -1083,7 +1083,7 @@ class AbstractPlotter(object):
         if self.save_plot:
             if not os.path.exists(output_path):
                 os.makedirs(output_path)
-            print "saving plot: {}".format(filename)
+            print("saving plot: {}".format(filename))
             plt.savefig(filename)
         if self.show_plot:
             plt.show()
@@ -1518,7 +1518,7 @@ class ComparisonPlotter_ECDF_BoxPlot(AbstractPlotter):
             scenario_ids = scenario_ids - self.forbidden_scenario_ids
 
         result = self.compute_relative_profits_arrays(scenario_ids)
-        print result
+        print(result)
 
         fig, axs = plt.subplots(nrows=2, figsize=FIGSIZE, sharex="col", sharey="row")
         # ax.set_xscale("log", basex=10)
@@ -1542,7 +1542,7 @@ class ComparisonPlotter_ECDF_BoxPlot(AbstractPlotter):
                     result_slice = np.concatenate((result_slice, result[erf][number_of_requests]))
 
                 ratio_rr_better = (len(np.where(result_slice > 1.29999)[0]))/(float(len(result_slice)))
-                print "{:0.2f} {:^12s} {:0.10f}".format(erf, number_of_requests_list, ratio_rr_better)
+                print("{:0.2f} {:^12s} {:0.10f}".format(erf, str(number_of_requests_list), ratio_rr_better))
 
                 sorted_data = np.sort(result_slice[~np.isnan(result_slice)])
                 max_observed_value = np.maximum(max_observed_value, sorted_data[-1])
@@ -1662,7 +1662,7 @@ class ComparisonPlotter_ECDF_BoxPlot(AbstractPlotter):
             scenario_ids = scenario_ids - self.forbidden_scenario_ids
 
         result = self.compute_relative_profits_arrays(scenario_ids)
-        print result
+        print(result)
 
         fig, axs = plt.subplots(nrows=2, figsize=FIGSIZE, sharex="col")
         # ax.set_xscale("log", basex=10)
@@ -2030,11 +2030,11 @@ class ComparisonPlotter_ECDF_BoxPlot(AbstractPlotter):
                             notch=True,
                             bootstrap=1000)
 
-        print bplots
-        print colors
+        print(bplots)
+        print(colors)
 
         for i in range(len(positions)):
-            print "Setting color of boxplot ", i
+            print("Setting color of boxplot ", i)
             color = colors[i]
             bplots['boxes'][i].set_edgecolor(color)
             bplots['boxes'][i].set_facecolor(
@@ -2427,7 +2427,7 @@ class ComparisonPlotter_ECDF_BoxPlot(AbstractPlotter):
             scenario_ids = scenario_ids - self.forbidden_scenario_ids
 
         result = self.compute_relative_profits_arrays(scenario_ids)
-        print result
+        print(result)
 
         fix, ax = plt.subplots(figsize=FIGSIZE)
         # ax.set_xscale("log", basex=10)
@@ -2541,7 +2541,7 @@ def evaluate_vine_and_randround(dc_vine,
         forbidden_scenario_ids = set()
 
     if exclude_generation_parameters is not None:
-        for key, values_to_exclude in exclude_generation_parameters.iteritems():
+        for key, values_to_exclude in exclude_generation_parameters.items():
             parameter_filter_path, parameter_values = extract_parameter_range(
                 dc_vine.scenario_parameter_container.scenarioparameter_room, key)
 

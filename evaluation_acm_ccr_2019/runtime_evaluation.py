@@ -44,7 +44,7 @@ from alib import solutions, util
 from vnep_approx import vine, treewidth_model
 
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 
@@ -145,7 +145,7 @@ def compute_aggregated_mean(list_of_aggregated_data, debug=False):
         mean += agg.mean * agg.value_count
         value_count += agg.value_count
     if debug:
-        print len(list_of_aggregated_data), value_count, mean / value_count
+        print(len(list_of_aggregated_data), value_count, mean / value_count)
     return mean / value_count
 
 
@@ -314,7 +314,7 @@ def extract_parameter_range(scenario_parameter_space, key):
 def _extract_parameter_range(scenario_parameter_space_dict, key, min_recursion_depth=0):
     if not isinstance(scenario_parameter_space_dict, dict):
         return None
-    for generator_name, value in scenario_parameter_space_dict.iteritems():
+    for generator_name, value in scenario_parameter_space_dict.items():
         if generator_name == key and min_recursion_depth <= 0:
             return [key], value
         if isinstance(value, list):
@@ -337,7 +337,7 @@ def lookup_scenarios_having_specific_values(scenario_parameter_space_dict, path,
     current_path = path[:]
     current_dict = scenario_parameter_space_dict
     while len(current_path) > 0:
-        if isinstance(current_path[0], basestring):
+        if isinstance(current_path[0], str):
             current_dict = current_dict[current_path[0]]
             current_path.pop(0)
         elif current_path[0] == 0:
@@ -352,7 +352,7 @@ def lookup_scenario_parameter_room_dicts_on_path(scenario_parameter_space_dict, 
     dicts_on_path = []
     while len(current_path) > 0:
         dicts_on_path.append(current_dict_or_list)
-        if isinstance(current_path[0], basestring):
+        if isinstance(current_path[0], str):
             current_dict_or_list = current_dict_or_list[current_path[0]]
             current_path.pop(0)
         elif isinstance(current_path[0], int):
@@ -507,7 +507,7 @@ class AbstractPlotter(object):
         if self.save_plot:
             if not os.path.exists(output_path):
                 os.makedirs(output_path)
-            print "saving plot: {}".format(filename)
+            print("saving plot: {}".format(filename))
             plt.savefig(filename)
         if self.show_plot:
             plt.show()
@@ -754,8 +754,12 @@ class RuntimeBoxplotPlotter(AbstractPlotter):
         #fig.subplots_adjust(hspace=0.3)
         #fig.subplots_adjust(left=0.15)
 
+        legend_title = inner_axis["x_axis_title_short"]
+        if legend_title == "NO_REQ":
+            legend_title = "#req."
+
         legend = plt.legend(handles=legend_handles,
-                            title=inner_axis["x_axis_title_short"],
+                            title=legend_title,
                             loc='center right',
                             fontsize=LEGEND_LABEL_FONTSIZE,
                             handletextpad=0.35, bbox_to_anchor=(0.99, 0.5), bbox_transform=plt.gcf().transFigure,
@@ -770,7 +774,7 @@ class RuntimeBoxplotPlotter(AbstractPlotter):
         ax.set_xticks(x_ticks, minor=False)
         ax.set_xticklabels(outer_axis_parameters, minor=False, fontsize=AXIS_TICKLABEL_FONTSIZE)
 
-        if not "non_log" in metric_specification.keys():
+        if not "non_log" in list(metric_specification.keys()):
             ax.set_yscale("log", nonposy='clip')
 
         ax.yaxis.grid(True, which="major", linestyle="-")
@@ -830,7 +834,7 @@ def evaluate_randround_runtimes(dc_randround_seplp_dynvmp,
         forbidden_scenario_ids = set()
 
     if exclude_generation_parameters is not None:
-        for key, values_to_exclude in exclude_generation_parameters.iteritems():
+        for key, values_to_exclude in exclude_generation_parameters.items():
             parameter_filter_path, parameter_values = extract_parameter_range(
                 dc_randround_seplp_dynvmp.scenario_parameter_container.scenarioparameter_room, key)
 
