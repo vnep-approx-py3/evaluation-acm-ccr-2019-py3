@@ -57,7 +57,7 @@ We generally propose to install our libraries (i.e. **alib**, **vnep_approx**, *
 You may either use our code via our API by importing the library or via our command line interface:
 
 ```
-python -m evaluation_acm_ccr_2019.cli --help
+python -m evaluation_acm_ccr_2019.cli                                                           
 Usage: cli.py [OPTIONS] COMMAND [ARGS]...
 
   This command-line interface allows you to access major parts of the VNEP-
@@ -76,26 +76,32 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  create_undirected_graph_storage_from_treewidth_experiments
+  create-undirected-graph-storage-from-treewidth-experiments
                                   Extracts undirected graphs from treewidth
                                   experiments
-  evaluate_separation_randround_vs_vine
+
+  evaluate-separation-randround-vs-vine
                                   Create plots comparing randomized rounding
                                   solutions (using the separation LP) with
                                   ViNE solutions
-  evaluate_separation_vs_cactus_lp
+
+  evaluate-separation-vs-cactus-lp
                                   Create plot comparing runtime of cactus lp
                                   and the separation lp with dynvmp
-  execute_treewidth_computation_experiment
+
+  execute-treewidth-computation-experiment
                                   Generate random graphs and compute the
                                   treewidth using Tamaki's algorithm.
-  reduce_to_plotdata_rr_seplp_optdynvmp
+
+  reduce-to-plotdata-rr-seplp-optdynvmp
                                   Extracts data to be plotted for the
                                   randomized rounding algorithms (using the
                                   separation LP and DynVMP)
-  reduce_to_plotdata_vine         Extracts data to be plotted the vine
+
+  reduce-to-plotdata-vine         Extracts data to be plotted the vine
                                   executions
-  treewidth_plot_computation_results
+
+  treewidth-plot-computation-results
                                   Generate plots for treewidth computation by
                                   Tamaki's algorithm
 ```
@@ -111,7 +117,7 @@ the virtual environment for the project and having installed all required depend
 
 ## Creating a Virtual Environment and Installing Packages
 
-First, create and activate a novel virtual environment for python2.7. 
+First, create and activate a novel virtual environment for python3.X. 
 
 ```
 python3.7 -m venv venv      #create new virtual environment in folder venv 
@@ -159,7 +165,7 @@ Above, the parameters 0 and 10000 specify which scenarios -- identified by their
 
 The complete options for experiment executions are:
 ```
-python -m vnep_approx.cli start_experiment  --help
+python -m vnep_approx.cli start-experiment --help
 Usage: cli.py start-experiment [OPTIONS] EXPERIMENT_YAML MIN_SCENARIO_INDEX
                                MAX_SCENARIO_INDEX
 
@@ -170,18 +176,23 @@ Options:
   --shuffle_instances / --original_order
                                   shall instances be shuffled or ordered
                                   according to their ids (ascendingly)
+
   --overwrite_existing_temporary_scenarios / --use_existing_temporary_scenarios
                                   shall existing temporary scenario files be
                                   overwritten or used?
+
   --overwrite_existing_intermediate_solutions / --use_existing_intermediate_solutions
                                   shall existing intermediate solution files
                                   be overwritten or used?
+
   --remove_temporary_scenarios / --keep_temporary_scenarios
                                   shall temporary scenario files be removed
                                   after execution?
+
   --remove_intermediate_solutions / --keep_intermediate_solutions
                                   shall intermediate solutions be removed
                                   after execution?
+
   --help                          Show this message and exit.
 ```
 
@@ -209,8 +220,8 @@ python -m evaluation_acm_ccr_2019.cli evaluate-separation-vs-cactus-lp sample_sc
 To study the treewidth of random graphs (and extract graphs of a specific treewidth), our evaluation framework offers the function  **execute-treewidth-computation-experiment**:
 
 ```
-python -m evaluation_acm_ccr_2019.cli execute-treewidth-computation-experiment  --help
-Usage: cli.py execute_treewidth_computation_experiment [OPTIONS]
+python -m evaluation_acm_ccr_2019.cli execute-treewidth-computation-experiment --help
+Usage: cli.py execute-treewidth-computation-experiment [OPTIONS]
                                                        YAML_PARAMETER_FILE
 
 Options:
@@ -219,6 +230,7 @@ Options:
   --remove_intermediate_solutions / --keep_intermediate_solutions
                                   shall intermediate solutions be removed
                                   after execution?
+
   --help                          Show this message and exit.
 ```
 Again, to specify the properties and the count of the random graphs to be created, a yaml file is used. In our example, this yaml file has the following structure:
