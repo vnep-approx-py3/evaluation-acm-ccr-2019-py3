@@ -1,12 +1,12 @@
 
 # Overview
 
-This repository contains the evaluation code as well as the raw results presented in our published in the ACM Computer Communication Review Journal [1].
+This repository contains the *Python 3.X** evaluation code as well as the raw results presented in our published in the ACM Computer Communication Review Journal [1]. The original **Python 2.7** code can be found in the repository **[https://github.com/vnep-approx/evaluation-acm-ccr-2019](https://github.com/vnep-approx/evaluation-acm-ccr-2019)**.
 
 The implementation of the respective algorithms can be found in our separate python packages: 
-- **[alib](https://github.com/vnep-approx/alib)**, providing for example the data model and the Mixed-Integer Program for the classic multi-commodity formulation, as well as
-- **[vnep_approx](https://github.com/vnep-approx/vnep_approx)**, providing novel Linear Programming formulations, specifically the one based on the Dyn-VMP algorithm, as well as our proposed Randomized Rounding algorithms.
-- **[evaluation_ifip_networking_2018](https://github.com/vnep-approx/evaluation_ifip_networking_2018)**, providing the base line LP solutions for our runtime comparison.
+- **[alib](https://github.com/vnep-approx-py3/alib)**, providing for example the data model and the Mixed-Integer Program for the classic multi-commodity formulation, as well as
+- **[vnep_approx](https://github.com/vnep-approx-py3/vnep_approx)**, providing novel Linear Programming formulations, specifically the one based on the Dyn-VMP algorithm, as well as our proposed Randomized Rounding algorithms.
+- **[evaluation_ifip_networking_2018](https://github.com/vnep-approx-py3/evaluation_ifip_networking_2018)**, providing the base line LP solutions for our runtime comparison.
 
 ## Contents
 
@@ -24,7 +24,7 @@ Due to the size of the respective pickle files of the **actual data**, these fil
 
 # Dependencies and Requirements
 
-The **vnep_approx** library requires Python 2.7. Required python libraries: gurobipy, numpy, cPickle, networkx , matplotlib, **[alib](https://github.com/vnep-approx/alib)**, **[vnep-approx](https://github.com/vnep-approx/vnep-approx)**, and **[evaluation-ifip-networking-2018](https://github.com/vnep-approx/evaluation-ifip-networking-2018)**.  
+The **evaluation_acm_ccr_2019** library requires Python 3.X. Required python libraries: gurobipy, numpy, networkx , matplotlib, **[alib](https://github.com/vnep-approx-py3/alib)**, **[vnep-approx](https://github.com/vnep-approx-py3/vnep-approx)**, and **[evaluation-ifip-networking-2018](https://github.com/vnep-approx-py3/evaluation-ifip-networking-2018)**.  
 
 Gurobi must be installed and the .../gurobi64/lib directory added to the environment variable LD_LIBRARY_PATH.
 
@@ -32,7 +32,8 @@ Furthermore, we use Tamaki's algorithm presented in his [paper at ESA 2017](http
 
 For generating and executing (etc.) experiments, the environment variable ALIB_EXPERIMENT_HOME must be set to a path, such that the subfolders input/ output/ and log/ exist.
 
-**Note**: Our source was only tested on Linux (specifically Ubuntu 14/16).  
+**Note**: Our source was tested on Linux (specifically Ubuntu 14 and Ubuntu 16) and Mac OS X 10.15.  
+
 
 # Installation
 
@@ -113,8 +114,8 @@ the virtual environment for the project and having installed all required depend
 First, create and activate a novel virtual environment for python2.7. 
 
 ```
-virtualenv --python=python2.7 venv  #create new virtual environment in folder venv 
-source venv/bin/activate            #activate the virtual environment
+python3.7 -m venv venv      #create new virtual environment in folder venv 
+source venv/bin/activate    #activate the virtual environment
 ```
 
 With the virtual environment still active, install the python extensions of [Gurobi](http://www.gurobi.com/) within the
@@ -141,17 +142,17 @@ meaning of the parameters in the respective command-line interface helps.
 While we have used the scenarios generated for the IFIP Networking 2018 evaluation, our example shows how to generate appropriate instances using:
 ```
 #generate scenarios
-python -m vnep_approx.cli generate_scenarios sample_scenarios.pickle sample_scenarios.yml
+python -m vnep_approx.cli generate-scenarios sample_scenarios.pickle sample_scenarios.yml
 ```
 Above, the file sample_scenarios.yml details the (quite many) parameters for the instance generation.
 Having generated the scenarios, both algorithms can be executed using the following commands:
 
 ```
 #run randomized rounding algorithm using cactus formulation
-python -m vnep_approx.cli start_experiment sample_randround_execution.yml 0 10000 --concurrent 2 --overwrite_existing_intermediate_solutions --remove_intermediate_solutions 
+python -m vnep_approx.cli start-experiment sample_randround_execution.yml 0 10000 --concurrent 2 --overwrite_existing_intermediate_solutions --remove_intermediate_solutions 
 
 #run randomized rounding algorithm using separation lp with dynvmp
-python -m vnep_approx.cli start_experiment sample_rr_seplp_optdynvmp.yml 0 10000 --concurrent 2 --overwrite_existing_intermediate_solutions --remove_temporary_scenarios --remove_intermediate_solutions
+python -m vnep_approx.cli start-experiment sample_rr_seplp_optdynvmp.yml 0 10000 --concurrent 2 --overwrite_existing_intermediate_solutions --remove_temporary_scenarios --remove_intermediate_solutions
 ```
 
 Above, the parameters 0 and 10000 specify which scenarios -- identified by their numeric id -- shall be executed. Furthermore, the number of processes to be used can be specified using the --concurrent option. As the execution process writes files for each scenario and each intermediate computed solution, several flags exist to control the behavior (see below for the details). Importantly, the algorithm to be executed are specified by the yaml-configuration files.
@@ -159,7 +160,7 @@ Above, the parameters 0 and 10000 specify which scenarios -- identified by their
 The complete options for experiment executions are:
 ```
 python -m vnep_approx.cli start_experiment  --help
-Usage: cli.py start_experiment [OPTIONS] EXPERIMENT_YAML MIN_SCENARIO_INDEX
+Usage: cli.py start-experiment [OPTIONS] EXPERIMENT_YAML MIN_SCENARIO_INDEX
                                MAX_SCENARIO_INDEX
 
 Options:
@@ -188,27 +189,27 @@ After having computed the solutions, the results are processed to extract only t
 The respective commands are:
 ```
 #extract data to be plotted
-python -m evaluation_ifip_networking_2018.cli reduce_to_plotdata_randround_pickle sample_scenarios_results_cactus.pickle
+python -m evaluation_ifip_networking_2018.cli reduce-to-plotdata-randround_pickle sample_scenarios_results_cactus.pickle
 move_logs_and_output log_cactus_reduction_to_plotdata
 
-python -m evaluation_acm_ccr_2019.cli reduce_to_plotdata_rand_round_pickle sample_scenarios_results_seplp_dynvmp.pickle
+python -m evaluation_acm_ccr_2019.cli reduce-to-plotdata-rand-round-pickle sample_scenarios_results_seplp_dynvmp.pickle
 move_logs_and_output log_seplp_dynvmp_reduction_to_plotdata
 ```
 
 Given the respective reduced plot data pickles, the runtime comparison plots can be created using:
 
 ```
-python -m evaluation_acm_ccr_2019.cli evaluate_separation_vs_cactus_lp sample_scenarios_results_seplp_dynvmp_reduced.pickle sample_scenarios_results_cactus_reduced.pickle  ./plots/ --output_filetype png --request_sets "[[20,30],[40,50]]"
+python -m evaluation_acm_ccr_2019.cli evaluate-separation-vs-cactus-lp sample_scenarios_results_seplp_dynvmp_reduced.pickle sample_scenarios_results_cactus_reduced.pickle  ./plots/ --output_filetype png --request_sets "[[20,30],[40,50]]"
 
-python -m evaluation_acm_ccr_2019.cli evaluate_separation_vs_cactus_lp sample_scenarios_results_seplp_dynvmp_reduced.pickle sample_scenarios_results_cactus_reduced.pickle  ./plots/ --output_filetype pdf --request_sets "[[20,30],[40,50]]"
+python -m evaluation_acm_ccr_2019.cli evaluate-separation-vs-cactus-lp sample_scenarios_results_seplp_dynvmp_reduced.pickle sample_scenarios_results_cactus_reduced.pickle  ./plots/ --output_filetype pdf --request_sets "[[20,30],[40,50]]"
 ```
 
 ## Study Treewidth using Tamaki's Algorithm
 
-To study the treewidth of random graphs (and extract graphs of a specific treewidth), our evaluation framework offers the function  **execute_treewidth_computation_experiment**:
+To study the treewidth of random graphs (and extract graphs of a specific treewidth), our evaluation framework offers the function  **execute-treewidth-computation-experiment**:
 
 ```
-python -m evaluation_acm_ccr_2019.cli execute_treewidth_computation_experiment  --help
+python -m evaluation_acm_ccr_2019.cli execute-treewidth-computation-experiment  --help
 Usage: cli.py execute_treewidth_computation_experiment [OPTIONS]
                                                        YAML_PARAMETER_FILE
 
@@ -237,7 +238,7 @@ If you want to keep graphs of a specific treewidth, set the **store_graphs_of_tr
 Given the results, the plots to analyze the treewidth and the runtime of Tamaki's algorithm, the following command can be called, which will readily generate the plots:
 
 ```
-python -m evaluation_acm_ccr_2019.cli treewidth_plot_computation_results sample_treewidth_computation.yml input/sample_treewidth_computation_results_aggregated_results.pickle ./plots/ --output_filetype pdf
+python -m evaluation_acm_ccr_2019.cli treewidth-plot-computation-results sample_treewidth_computation.yml input/sample_treewidth_computation_results_aggregated_results.pickle ./plots/ --output_filetype pdf
 ```
 
 ## Compare ViNE and Randomized Rounding Heuristics
@@ -246,16 +247,16 @@ To compare the performance of the ViNE offline variant WiNE with our randomized 
 
 ```
 #compute treewidths of random graphs according to parameters of the yml file
-python -m evaluation_acm_ccr_2019.cli execute_treewidth_computation_experiment --threads 4 sample_treewidth_computation.yml --timeout 5400 --remove_intermediate_solutions
+python -m evaluation_acm_ccr_2019.cli execute-treewidth-computation-experiment --threads 4 sample_treewidth_computation.yml --timeout 5400 --remove_intermediate_solutions
 
 #extract undirected graph storage
-python -m evaluation_acm_ccr_2019.cli create_undirected_graph_storage_from_treewidth_experiments input/sample_treewidth_computation_results_aggregated_results.pickle input/sample_undirected_graph_storage.pickle 2 3 
+python -m evaluation_acm_ccr_2019.cli create-undirected-graph-storage-from-treewidth-experiments input/sample_treewidth_computation_results_aggregated_results.pickle input/sample_undirected_graph_storage.pickle 2 3 
 ```
 The undirected graph storage pickle will contain (memory-efficient) representations of the generated graphs, which are classified using the treewidth. To use these graphs using the generation, the respective undirected graph storage contained has to be specified in the yaml file when generating scenarios (see [sample/vine_vs_randround/sample_scenario_generation.yml](sample/vine_vs_randround/sample_scenario_generation.yml)). The actual scenario generation is then again performed by the base library:
 
 ```
 #generate scenarios
-python -m vnep_approx.cli generate_scenarios sample_scenarios.pickle sample_scenario_generation.yml --threads 4
+python -m vnep_approx.cli generate-scenarios sample_scenarios.pickle sample_scenario_generation.yml --threads 4
 ```
  
 
@@ -313,16 +314,16 @@ Having executed both ViNE and the randomized rounding heuristics based on the se
 
 ```
 #extract data to be plotted
-python -m evaluation_acm_ccr_2019.cli reduce_to_plotdata_rr_seplp_optdynvmp sample_scenarios_results_seplp_dynvmp.pickle
+python -m evaluation_acm_ccr_2019.cli reduce-to-plotdata-rr-seplp-optdynvmp sample_scenarios_results_seplp_dynvmp.pickle
 
-python -m evaluation_acm_ccr_2019.cli reduce_to_plotdata_vine sample_scenarios_ViNE_results.pickle
+python -m evaluation_acm_ccr_2019.cli reduce-to-plotdata-vine sample_scenarios_ViNE_results.pickle
 ```
 
 Lastly, using the command **python -m evaluation_acm_ccr_2019.cli evaluate_separation_randround_vs_vine ** several different types of plots are executed: 
 
 ```
 
-python -m evaluation_acm_ccr_2019.cli evaluate_separation_randround_vs_vine sample_scenarios_results_seplp_dynvmp_reduced.pickle sample_scenarios_ViNE_results_reduced.pickle ./plots/ --request_sets "[[20,30], [40,50]]" --output_filetype pdf --papermode
+python -m evaluation_acm_ccr_2019.cli evaluate-separation-randround-vs-vine sample_scenarios_results_seplp_dynvmp_reduced.pickle sample_scenarios_ViNE_results_reduced.pickle ./plots/ --request_sets "[[20,30], [40,50]]" --output_filetype pdf --papermode
 move_logs_and_output log_plot_pdf
 ```
 
